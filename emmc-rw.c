@@ -60,25 +60,23 @@
 };
  */
 
-struct frame {
-	u_int8_t  data[512];
-};
+
 
 
 
 int main(int argc, char **argv )
 {
-    struct frame in_frame;
+    __u8 buf[512];    
     int ret = 0, fd;
     struct mmc_ioc_cmd ioc;
 	
-    ioc->opcode = MMC_READ_MULTIPLE_BLOCK;                      //Command We need to send
-	ioc->write_flag = 0;                                        //Read or Write
-	ioc->arg = 0x0;                                             //No arg
-	ioc->blksz = 512;                                           //Block size
-	ioc->blocks = 1;                                            //Number of blocks 
-	ioc->flags = MMC_RSP_SPI_R1 | MMC_RSP_R1 | MMC_CMD_ADTC;    //Define more about the commands
-    mmc_ioc_cmd_set_data(ioc, in_frame);
+    ioc.opcode = MMC_READ_MULTIPLE_BLOCK;                      //Command We need to send
+	ioc.write_flag = 0;                                        //Read or Write
+	ioc.arg = 0x0;                                             //No arg
+	ioc.blksz = 512;                                           //Block size
+	ioc.blocks = 1;                                            //Number of blocks 
+	ioc.flags = MMC_RSP_SPI_R1 | MMC_RSP_R1 | MMC_CMD_ADTC;    //Define more about the commands
+    mmc_ioc_cmd_set_data(ioc, buf);
 
     fd = open(argv[1], O_RDWR);                                 //Open device
     if (fd < 0) {                  
@@ -87,10 +85,10 @@ int main(int argc, char **argv )
     }
     
     ret = ioctl(fd, MMC_IOC_CMD, &ioc);
-    printf("Readed data:\n")
+    printf("Readed data:\n");
     for(int i=0;i<512;i++)
     {
-        printf("%d",in_frame.data[i]);            
+        printf("%d",buf[i]);            
     }
     close(fd);
 }
