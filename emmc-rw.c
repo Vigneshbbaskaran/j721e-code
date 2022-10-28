@@ -19,9 +19,9 @@ int main(int argc, char **argv )
 {
     __u8 buf[512];    
     int ret = 0, fd;
-    struct mmc_ioc_cmd ioc;
+    struct mmc_ioc_cmd ioc;                                    //Basic MMC structure
 	
-    ioc.opcode = MMC_READ_MULTIPLE_BLOCK;                      //Command We need to send
+    ioc.opcode = MMC_READ_SINGLE_BLOCK;                       //Command We need to send
 	ioc.write_flag = 0;                                        //Read or Write
 	ioc.arg = 0x0;                                             //No arg
 	ioc.blksz = 512;                                           //Block size
