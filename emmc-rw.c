@@ -15,55 +15,6 @@
 //#include <linux/mmc/ioctl.h>
 #include "mmc.h"
 
-/*struct mmc_ioc_cmd {
-	/*
-	 * Direction of data: nonzero = write, zero = read.
-	 * Bit 31 selects 'Reliable Write' for RPMB.
-	 */
-//	int write_flag;
-
-	/* Application-specific command.  true = precede with CMD55 */
-/* 	int is_acmd;
-
-	__u32 opcode;
-	__u32 arg;
-	__u32 response[4]; */  /* CMD response */
-/* 	unsigned int flags;
-	unsigned int blksz;
-	unsigned int blocks;
-*/
-	/*
-	 * Sleep at least postsleep_min_us useconds, and at most
-	 * postsleep_max_us useconds *after* issuing command.  Needed for
-	 * some read commands for which cards have no other way of indicating
-	 * they're ready for the next command (i.e. there is no equivalent of
-	 * a "busy" indicator for read operations).
-	 */
-/* 	unsigned int postsleep_min_us;
-	unsigned int postsleep_max_us;
- */
-	/*
-	 * Override driver-computed timeouts.  Note the difference in units!
-	 */
-/* 	unsigned int data_timeout_ns;
-	unsigned int cmd_timeout_ms;
- */
-	/*
-	 * For 64-bit machines, the next member, ``__u64 data_ptr``, wants to
-	 * be 8-byte aligned.  Make sure this struct is the same size when
-	 * built for 32-bit.
-	 */
-/* 	__u32 __pad;
- */
-	/* DAT buffer */
-/* 	__u64 data_ptr;
-};
- */
-
-
-
-
-
 int main(int argc, char **argv )
 {
     __u8 buf[512];    
@@ -83,8 +34,14 @@ int main(int argc, char **argv )
         printf("Failed to open eMMC device, please check which name you have passed\n");
         return 1;
     }
-    
+    printf("Device Opened Successfully\n");
     ret = ioctl(fd, MMC_IOC_CMD, &ioc);
+    if(ret!=0)
+        {
+            printf("Ioctl Fails\n");
+            return 1; 
+        }
+    printf("Ioctl Successfully\n");
     printf("Readed data:\n");
     for(int i=0;i<512;i++)
     {
