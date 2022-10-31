@@ -6,13 +6,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main(int argc, char *argv[])
-{	
-	char buff[20];
-	int fd,i,j;
+int write_device(char *dev)
+{
+	int fd,ret;
 	char buf[]="Vignesh Baskaran";
-	printf("\ndev name:%s\n",argv[1]);
-	fd=open(argv[1],O_CREAT|O_RDWR|O_TRUNC,0666);	
+	fd=open(dev,O_CREAT|O_RDWR|O_TRUNC,0666);	
         if(fd<0)
                 {
                         perror("Open fail");
@@ -22,18 +20,25 @@ int main(int argc, char *argv[])
 		{
 			printf("Open success for write operation\n");
 		}	
-	j=write(fd,&buf,20);
-	if(j<=0)
+	ret=write(fd,&buf,17);
+	if(ret<=0)
 		{
 			perror("write fails:\n");
 			exit(1);
 		}
 	else
 	{
-		printf("Write Success:%d\n",j);
+		printf("Write Success:%d\n",ret);
 	}
 	close(fd);
-	fd=open(argv[1],O_RDONLY);
+	return 0;
+}
+
+int read_device(char *dev)
+{
+	int fd,i,j;
+	char buff[4096];
+	fd=open(dev,O_RDONLY);
 	if(fd<0)
 		{
 			perror("Open fail");
@@ -44,8 +49,7 @@ int main(int argc, char *argv[])
 	j=0;
 	for(i=0;i<4;i++)
 	{
-	//	printf("\n");
-		j=read(fd,&buff,5);
+		j=read(fd,&buff,4096);
 		if(j<0)
 		{
 			perror("Read fails..!!");
@@ -53,10 +57,29 @@ int main(int argc, char *argv[])
 		}
 		else if(j==0)
 			break;
-		//printf("%d.data:\n",i);
-		write(1,&buff,5);
+		write(1,&buff,4096);
 	}
 	close(fd);
+	return 0;
+}
+
+int main(int argc, char **argv)
+{	
+	char *device;
+	int ret;	
+
+	device = argv[1];
+	printf("\ndev name:%s\n",device);
+	printf("\ndev name:%s\n",device);
+
+	ret = write_device(device);
+	if(ret!=0)
+		exit(1);
+	
+	ret = read_device(device);
+	if(ret!=0)
+		exit(1);
+
 	printf("\n");
 	return 0;
 }
