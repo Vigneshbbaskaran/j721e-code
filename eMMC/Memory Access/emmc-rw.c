@@ -1,53 +1,62 @@
-#include<stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <stdint.h>
-#include <assert.h>
-#include <linux/fs.h>
-//#include <linux/major.h>
-//#include <linux/mmc/ioctl.h>
-#include "mmc.h"
-
-int main(int argc, char **argv )
-{
-    __u8 buf[512];    
-    int ret = 0, fd;
-    struct mmc_ioc_cmd ioc;                                    //Basic MMC structure
-	
-    ioc.opcode = MMC_READ_SINGLE_BLOCK;                       //Command We need to send
-	ioc.write_flag = 0;                                        //Read or Write
-	ioc.arg = 0x0;                                             //No arg
-	ioc.blksz = 512;                                           //Block size
-	ioc.blocks = 1;                                            //Number of blocks 
-	ioc.flags = MMC_RSP_SPI_R1 | MMC_RSP_R1 | MMC_CMD_ADTC;    //Define more about the commands
-    mmc_ioc_cmd_set_data(ioc, buf);
-
-    fd = open(argv[1], O_RDWR);                                 //Open device
-    if (fd < 0) {                  
-        printf("Failed to open eMMC device, please check which name you have passed\n");
-        return 1;
-    }
-    printf("Device Opened Successfully\n");
-    ret = ioctl(fd, MMC_IOC_CMD, &ioc);
-    if(ret!=0)
-        {
-            printf("Ioctl Fails\n");
-            return 1; 
-        }
-    printf("Ioctl Successfully\n");
-    printf("Readed data:\n");
-    for(int i=0;i<512;i++)
-    {
-        printf("%d",buf[i]);            
-    }
-    close(fd);
+int main(int argc, char *argv[])
+{	
+	char buff[20];
+	int fd,i,j;
+	char buf[]="Vignesh Baskaran";
+	printf("\ndev name:%s\n",argv[1]);
+	fd=open(argv[1],O_CREAT|O_RDWR|O_TRUNC,0666);	
+        if(fd<0)
+                {
+                        perror("Open fail");
+                        _exit(1);
+                }
+	else
+		{
+			printf("Open success for write operation\n");
+		}	
+	j=write(fd,&buf,20);
+	if(j<=0)
+		{
+			perror("write fails:\n");
+			exit(1);
+		}
+	else
+	{
+		printf("Write Success:%d\n",j);
+	}
+	close(fd);
+	fd=open(argv[1],O_RDONLY);
+	if(fd<0)
+		{
+			perror("Open fail");
+			_exit(1);
+		}
+	else
+		printf("Open succcess for read\n");	
+	j=0;
+	for(i=0;i<4;i++)
+	{
+	//	printf("\n");
+		j=read(fd,&buff,5);
+		if(j<0)
+		{
+			perror("Read fails..!!");
+			_exit(1);
+		}
+		else if(j==0)
+			break;
+		//printf("%d.data:\n",i);
+		write(1,&buff,5);
+	}
+	close(fd);
+	printf("\n");
+	return 0;
 }
-
-
